@@ -1,21 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
-const previewCards = [
-  {
-    title: '장소 선택',
-    description: '오늘 자주 가는 장소를 고르면 상황에 맞는 가방 준비를 시작할 수 있어요.',
-  },
-  {
-    title: '소지품 고르기',
-    description: '필요한 물건을 선택하거나 직접 입력해서 오늘의 체크리스트를 만들어요.',
-  },
-  {
-    title: '가방 조합 저장',
-    description: '마음에 드는 가방 조합은 저장해두고 다음에 다시 빠르게 불러올 수 있어요.',
-  },
-] as const
-
 const places = [
   { name: '학교', icon: '🎓', hint: '수업과 과제를 위한 준비' },
   { name: '카페', icon: '☕', hint: '가볍게 머무르며 집중하기' },
@@ -57,7 +42,7 @@ const bags = [
 
 const SAVED_COMBINATIONS_KEY = 'whats-in-my-bag:saved-combinations'
 
-type Step = 'intro' | 'place' | 'items' | 'bags' | 'summary' | 'saved'
+type Step = 'intro' | 'place' | 'items' | 'bags' | 'summary' | 'final' | 'saved'
 type SavedCombination = {
   id: number
   name: string
@@ -159,7 +144,7 @@ function App() {
     setSelectedItems(combination.items)
     setCustomItems(nextCustomItems)
     setCheckedItems([])
-    setCurrentStep('summary')
+    setCurrentStep('final')
   }
 
   const handleDeleteCombination = (combinationId: number) => {
@@ -172,30 +157,36 @@ function App() {
     <main className="app">
       <div className="screen-shell">
         {currentStep === 'intro' && (
-          <>
-            <section className="hero">
-              <p className="eyebrow">Daily bag planner</p>
-              <h1>오늘의 가방</h1>
-              <p className="body">
-                오늘 갈 장소와 챙길 물건을 정리하고, 내게 맞는 가방 조합을 한눈에 준비해보세요.
-              </p>
-              <div className="hero-actions">
-                <button className="cta" type="button" onClick={() => setCurrentStep('place')}>
-                  오늘의 가방 만들기
-                </button>
-              </div>
-            </section>
+          <section className="home-screen" aria-labelledby="home-heading">
+            <div className="home-copy">
+              <p className="eyebrow">What&apos;s in my Bag?</p>
+              <h1 id="home-heading">오늘의 가방</h1>
+              <p className="home-subtitle">What&apos;s in my Bag?</p>
+            </div>
 
-            <section className="preview" aria-label="앞으로 들어갈 기능 미리보기">
-              {previewCards.map((card, index) => (
-                <article className="feature-card" key={card.title}>
-                  <p className="feature-step">0{index + 1}</p>
-                  <h2>{card.title}</h2>
-                  <p>{card.description}</p>
-                </article>
-              ))}
-            </section>
-          </>
+            <div className="home-illustration" aria-hidden="true">
+              <div className="bag-illustration">
+                <div className="bag-handle" />
+                <div className="bag-flap" />
+                <div className="bag-pocket-front">
+                  <span>🎒</span>
+                </div>
+              </div>
+            </div>
+
+            <p className="body home-body">
+              장소에 맞는 소지품을 추천받고 오늘의 가방을 완성해보세요.
+            </p>
+
+            <div className="home-actions">
+              <button className="cta home-cta" type="button" onClick={() => setCurrentStep('place')}>
+                START
+              </button>
+              <button className="ghost-button home-ghost-button" type="button" onClick={() => setCurrentStep('saved')}>
+                SAVED BAGS
+              </button>
+            </div>
+          </section>
         )}
 
         {currentStep === 'place' && (
@@ -619,6 +610,14 @@ function App() {
               <button
                 className="cta"
                 type="button"
+                onClick={() => setCurrentStep('final')}
+                disabled={!selectedPlace || !selectedBag || selectedItems.length === 0}
+              >
+                오늘의 가방 완성하기
+              </button>
+              <button
+                className="cta"
+                type="button"
                 onClick={handleSaveCombination}
                 disabled={!selectedPlace || !selectedBag || selectedItems.length === 0}
               >
@@ -626,6 +625,65 @@ function App() {
               </button>
               <button className="ghost-button" type="button" onClick={() => setCurrentStep('saved')}>
                 저장된 가방 보기
+              </button>
+            </div>
+          </section>
+        )}
+
+        {currentStep === 'final' && (
+          <section className="place-section final-section" aria-labelledby="final-heading">
+            <div className="step-header">
+              <div className="section-copy">
+                <p className="section-eyebrow">Step 05</p>
+                <h2 id="final-heading">오늘의 가방</h2>
+              </div>
+            </div>
+
+            <div className="final-card">
+              <div className="final-bag-stage" aria-live="polite">
+                <div className="final-bag-icon" aria-hidden="true">
+                  {selectedBag?.icon ?? '🎒'}
+                </div>
+                <p className="final-bag-name">{selectedBag?.name ?? '가방을 선택해주세요'}</p>
+                <p className="final-bag-caption">{selectedBag?.hint ?? '오늘의 가방 정보가 여기에 표시됩니다.'}</p>
+              </div>
+
+              <div className="final-summary-grid">
+                <div className="final-summary-card">
+                  <p className="selected-label">장소</p>
+                  <p className="final-summary-value">장소: {selectedPlace?.name ?? '-'}</p>
+                </div>
+
+                <div className="final-summary-card">
+                  <p className="selected-label">총 소지품 개수</p>
+                  <p className="final-summary-value">{selectedItems.length}개</p>
+                </div>
+
+                <div className="final-summary-card">
+                  <p className="selected-label">오늘 챙길 물건</p>
+                  {selectedItems.length > 0 ? (
+                    <div className="final-items-list">
+                      {selectedItems.map((item) => (
+                        <div className="final-item-card" key={item}>
+                          <span className="final-item-mark" aria-hidden="true">
+                            •
+                          </span>
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="selected-empty">선택한 소지품이 없습니다.</p>
+                  )}
+                </div>
+              </div>
+
+              <p className="final-message">오늘의 가방이 준비되었어요. 필요한 물건을 확인하고 가볍게 출발해보세요.</p>
+            </div>
+
+            <div className="step-actions">
+              <button className="ghost-button" type="button" onClick={() => setCurrentStep('intro')}>
+                처음으로
               </button>
             </div>
           </section>
@@ -670,7 +728,7 @@ function App() {
                           type="button"
                           onClick={() => handleLoadCombination(combination)}
                         >
-                          불러오기
+                          오늘의 가방으로 선택
                         </button>
                         <button
                           className="ghost-button ghost-button-danger"
