@@ -449,10 +449,92 @@ h1 {
   box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.14);
 }
 
+.checklist-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.14);
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.checklist-item:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 0 0 1px rgba(217, 119, 6, 0.18),
+    0 10px 20px rgba(60, 47, 31, 0.06);
+}
+
+.checklist-item.is-checked {
+  background: linear-gradient(180deg, rgba(255, 250, 240, 0.98) 0%, rgba(255, 244, 230, 0.98) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(217, 119, 6, 0.18),
+    0 10px 20px rgba(217, 119, 6, 0.08);
+}
+
+.checklist-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checklist-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(154, 91, 22, 0.24);
+  border-radius: 999px;
+  background: #fffdf8;
+  color: #c2410c;
+  font-size: 0.95rem;
+  font-weight: 800;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.checklist-item.is-checked .checklist-box {
+  border-color: rgba(217, 119, 6, 0.45);
+  background: #fff3d8;
+  transform: scale(1.03);
+}
+
+.checklist-text {
+  color: #374151;
+  font-weight: 700;
+  transition:
+    color 160ms ease,
+    opacity 160ms ease,
+    text-decoration-color 160ms ease;
+}
+
+.checklist-item.is-checked .checklist-text {
+  color: #8a5415;
+  opacity: 0.72;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
 .summary-grid {
   margin-top: 28px;
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
 }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 const previewCards = [
@@ -53,6 +53,7 @@ function App() {
   const [selectedPlace, setSelectedPlace] = useState<(typeof places)[number] | null>(null)
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [selectedBag, setSelectedBag] = useState<(typeof bags)[number] | null>(null)
+  const [checkedItems, setCheckedItems] = useState<string[]>([])
   const [customItems, setCustomItems] = useState<string[]>([])
   const [showCustomItemInput, setShowCustomItemInput] = useState(false)
   const [customItemInput, setCustomItemInput] = useState('')
@@ -79,6 +80,20 @@ function App() {
     setCustomItemInput('')
     setShowCustomItemInput(false)
   }
+
+  const toggleCheckedItem = (item: string) => {
+    setCheckedItems((currentItems) =>
+      currentItems.includes(item)
+        ? currentItems.filter((currentItem) => currentItem !== item)
+        : [...currentItems, item],
+    )
+  }
+
+  useEffect(() => {
+    setCheckedItems((currentItems) =>
+      currentItems.filter((currentItem) => selectedItems.includes(currentItem)),
+    )
+  }, [selectedItems])
 
   return (
     <main className="app">
@@ -424,6 +439,39 @@ function App() {
                   )}
                 </div>
 
+                <div className="bag-preview-panel" aria-live="polite">
+                  <p className="selected-label">오늘의 가방 구성</p>
+                  <div className="bag-preview">
+                    <div className="bag-preview-frame">
+                      <div className="bag-preview-header">
+                        <div className="bag-preview-emoji" aria-hidden="true">
+                          {selectedBag?.icon ?? '🎒'}
+                        </div>
+                        <div className="bag-preview-copy">
+                          <p className="bag-preview-name">{selectedBag?.name ?? '가방을 선택해주세요'}</p>
+                          <p className="bag-preview-hint">
+                            {selectedBag?.hint ?? '선택한 가방 정보가 여기에 표시됩니다.'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="bag-pocket">
+                        <div className="bag-pocket-inner">
+                          {selectedItems.length > 0 ? (
+                            selectedItems.map((item) => (
+                              <span className="bag-item-tag" key={item}>
+                                {item}
+                              </span>
+                            ))
+                          ) : (
+                            <p className="selected-empty">가방 안에 표시할 소지품이 없습니다.</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="selected-place summary-stat-card" aria-live="polite">
                   <p className="selected-label">소지품 개수</p>
                   <div className="summary-stat-content">
@@ -435,49 +483,28 @@ function App() {
                 <div className="selected-items" aria-live="polite">
                   <p className="selected-label">체크리스트</p>
                   {selectedItems.length > 0 ? (
-                    <div className="selected-items-list">
+                    <div className="checklist-list" role="list" aria-label="소지품 체크리스트">
                       {selectedItems.map((item) => (
-                        <span className="selected-item-pill" key={item}>
-                          {item}
-                        </span>
+                        <label
+                          className={`checklist-item${checkedItems.includes(item) ? ' is-checked' : ''}`}
+                          key={item}
+                        >
+                          <input
+                            className="checklist-input"
+                            type="checkbox"
+                            checked={checkedItems.includes(item)}
+                            onChange={() => toggleCheckedItem(item)}
+                          />
+                          <span className="checklist-box" aria-hidden="true">
+                            {checkedItems.includes(item) ? '✓' : ''}
+                          </span>
+                          <span className="checklist-text">{item}</span>
+                        </label>
                       ))}
                     </div>
                   ) : (
                     <p className="selected-empty">선택한 소지품이 없습니다.</p>
                   )}
-                </div>
-              </div>
-
-              <div className="bag-preview-panel" aria-live="polite">
-                <p className="selected-label">오늘의 가방 구성</p>
-                <div className="bag-preview">
-                  <div className="bag-preview-frame">
-                    <div className="bag-preview-header">
-                      <div className="bag-preview-emoji" aria-hidden="true">
-                        {selectedBag?.icon ?? '🎒'}
-                      </div>
-                      <div className="bag-preview-copy">
-                        <p className="bag-preview-name">{selectedBag?.name ?? '가방을 선택해주세요'}</p>
-                        <p className="bag-preview-hint">
-                          {selectedBag?.hint ?? '선택한 가방 정보가 여기에 표시됩니다.'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="bag-pocket">
-                      <div className="bag-pocket-inner">
-                        {selectedItems.length > 0 ? (
-                          selectedItems.map((item) => (
-                            <span className="bag-item-tag" key={item}>
-                              {item}
-                            </span>
-                          ))
-                        ) : (
-                          <p className="selected-empty">가방 안에 표시할 소지품이 없습니다.</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
