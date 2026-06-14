@@ -46,7 +46,9 @@ const bags = [
   { name: '에코백', icon: '〰️', hint: '가볍고 캐주얼한 분위기로 들기 좋아요.' },
 ] as const
 
-type Step = 'intro' | 'place' | 'items' | 'bags' | 'summary'
+const SAVED_COMBINATIONS_KEY = 'whats-in-my-bag:saved-combinations'
+
+type Step = 'intro' | 'place' | 'items' | 'bags' | 'summary' | 'saved'
 type SavedCombination = {
   id: number
   name: string
@@ -60,7 +62,23 @@ function App() {
   const [selectedPlace, setSelectedPlace] = useState<(typeof places)[number] | null>(null)
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [selectedBag, setSelectedBag] = useState<(typeof bags)[number] | null>(null)
-  const [savedCombinations, setSavedCombinations] = useState<SavedCombination[]>([])
+  const [savedCombinations, setSavedCombinations] = useState<SavedCombination[]>(() => {
+    if (typeof window === 'undefined') {
+      return []
+    }
+
+    const savedValue = window.localStorage.getItem(SAVED_COMBINATIONS_KEY)
+
+    if (!savedValue) {
+      return []
+    }
+
+    try {
+      return JSON.parse(savedValue) as SavedCombination[]
+    } catch {
+      return []
+    }
+  })
   const [checkedItems, setCheckedItems] = useState<string[]>([])
   const [customItems, setCustomItems] = useState<string[]>([])
   const [showCustomItemInput, setShowCustomItemInput] = useState(false)
@@ -103,6 +121,10 @@ function App() {
     )
   }, [selectedItems])
 
+  useEffect(() => {
+    window.localStorage.setItem(SAVED_COMBINATIONS_KEY, JSON.stringify(savedCombinations))
+  }, [savedCombinations])
+
   const handleSaveCombination = () => {
     if (!selectedPlace || !selectedBag || selectedItems.length === 0) {
       return
@@ -117,6 +139,23 @@ function App() {
     }
 
     setSavedCombinations((currentCombinations) => [nextCombination, ...currentCombinations])
+  }
+
+  const handleLoadCombination = (combination: SavedCombination) => {
+    const nextCustomItems = combination.items.filter((item) => !items.includes(item as (typeof items)[number]))
+
+    setSelectedPlace(combination.place)
+    setSelectedBag(combination.bag)
+    setSelectedItems(combination.items)
+    setCustomItems(nextCustomItems)
+    setCheckedItems([])
+    setCurrentStep('summary')
+  }
+
+  const handleDeleteCombination = (combinationId: number) => {
+    setSavedCombinations((currentCombinations) =>
+      currentCombinations.filter((combination) => combination.id !== combinationId),
+    )
   }
 
   return (
@@ -545,16 +584,26 @@ function App() {
               >
                 이 조합 저장하기
               </button>
+              <button className="ghost-button" type="button" onClick={() => setCurrentStep('saved')}>
+                저장된 가방 보기
+              </button>
+            </div>
+          </section>
+        )}
+
+        {currentStep === 'saved' && (
+          <section className="place-section" aria-labelledby="saved-heading">
+            <div className="step-header">
+              <div className="section-copy">
+                <p className="section-eyebrow">Saved Bags</p>
+                <h2 id="saved-heading">저장된 가방 조합</h2>
+                <p className="section-body">
+                  저장해둔 가방 조합을 다시 불러오거나 필요 없는 조합을 정리할 수 있어요.
+                </p>
+              </div>
             </div>
 
             <div className="saved-combinations" aria-live="polite">
-              <div className="saved-combinations-header">
-                <p className="selected-label">저장된 가방 조합</p>
-                <p className="saved-combinations-copy">
-                  저장한 조합은 이 화면에서 바로 확인할 수 있어요.
-                </p>
-              </div>
-
               {savedCombinations.length > 0 ? (
                 <div className="saved-combinations-list">
                   {savedCombinations.map((combination) => (
@@ -575,21 +624,39 @@ function App() {
                         <span className="saved-meta-pill">소지품 {combination.items.length}개</span>
                       </div>
 
-                      <div className="selected-items-list">
-                        {combination.items.map((item) => (
-                          <span className="selected-item-pill" key={`${combination.id}-${item}`}>
-                            {item}
-                          </span>
-                        ))}
+                      <div className="saved-combination-actions">
+                        <button
+                          className="ghost-button"
+                          type="button"
+                          onClick={() => handleLoadCombination(combination)}
+                        >
+                          불러오기
+                        </button>
+                        <button
+                          className="ghost-button ghost-button-danger"
+                          type="button"
+                          onClick={() => handleDeleteCombination(combination.id)}
+                        >
+                          삭제
+                        </button>
                       </div>
                     </article>
                   ))}
                 </div>
               ) : (
-                <p className="selected-empty">
-                  아직 저장된 조합이 없어요. 현재 가방 구성을 저장해보세요.
-                </p>
+                <div className="saved-empty-state">
+                  <p className="selected-empty">저장된 가방 조합이 없어요</p>
+                  <button className="cta" type="button" onClick={() => setCurrentStep('summary')}>
+                    새 조합 만들기
+                  </button>
+                </div>
               )}
+            </div>
+
+            <div className="step-actions">
+              <button className="ghost-button" type="button" onClick={() => setCurrentStep('summary')}>
+                뒤로가기
+              </button>
             </div>
           </section>
         )}
