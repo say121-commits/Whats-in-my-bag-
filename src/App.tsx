@@ -25,6 +25,15 @@ const places = [
   { name: '직접 입력', icon: '✍️', hint: '내 일정에 맞는 장소 직접 정하기' },
 ] as const
 
+const recommendedItemsByPlace: Record<(typeof places)[number]['name'], readonly string[]> = {
+  학교: ['노트북', '충전기', '다이어리', '물병'],
+  카페: ['휴대폰', '이어폰', '다이어리', '립밤'],
+  알바: ['지갑', '휴대폰', '물병', '열쇠'],
+  여행: ['지갑', '충전기', '물병', '이어폰'],
+  도서관: ['노트북', '다이어리', '물병', '이어폰'],
+  '직접 입력': ['지갑', '휴대폰', '충전기', '열쇠'],
+} as const
+
 const items = [
   '지갑',
   '휴대폰',
@@ -85,6 +94,7 @@ function App() {
   const [customItemInput, setCustomItemInput] = useState('')
 
   const allItems = [...items, ...customItems]
+  const recommendedItems = selectedPlace ? recommendedItemsByPlace[selectedPlace.name] : []
 
   const toggleItem = (item: string) => {
     setSelectedItems((currentItems) =>
@@ -169,9 +179,11 @@ function App() {
               <p className="body">
                 오늘 갈 장소와 챙길 물건을 정리하고, 내게 맞는 가방 조합을 한눈에 준비해보세요.
               </p>
-              <button className="cta" type="button" onClick={() => setCurrentStep('place')}>
-                오늘의 가방 만들기
-              </button>
+              <div className="hero-actions">
+                <button className="cta" type="button" onClick={() => setCurrentStep('place')}>
+                  오늘의 가방 만들기
+                </button>
+              </div>
             </section>
 
             <section className="preview" aria-label="앞으로 들어갈 기능 미리보기">
@@ -282,6 +294,34 @@ function App() {
                 <p className="selected-empty">아직 선택된 장소가 없습니다.</p>
               )}
             </div>
+
+            {selectedPlace && (
+              <div className="selected-items recommendation-panel" aria-live="polite">
+                <p className="selected-label">AI 추천 소지품</p>
+                <p className="recommendation-copy">
+                  선택한 장소에 맞춰 먼저 챙기면 좋은 물건들을 추천해드렸어요.
+                </p>
+                <div className="recommendation-list" role="list" aria-label="추천 소지품 목록">
+                  {recommendedItems.map((item) => {
+                    const isSelected = selectedItems.includes(item)
+
+                    return (
+                      <button
+                        key={item}
+                        className={`item-chip recommendation-chip${isSelected ? ' is-selected' : ''}`}
+                        type="button"
+                        onClick={() => toggleItem(item)}
+                      >
+                        <span className="item-chip-mark" aria-hidden="true">
+                          {isSelected ? '✓' : 'AI'}
+                        </span>
+                        <span>{item}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             <div className="item-grid" role="list" aria-label="소지품 선택 목록">
               {allItems.map((item) => {
