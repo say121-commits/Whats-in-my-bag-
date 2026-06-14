@@ -46,7 +46,7 @@ const bags = [
   { name: '에코백', icon: '〰️', hint: '가볍고 캐주얼한 분위기로 들기 좋아요.' },
 ] as const
 
-type Step = 'intro' | 'place' | 'items' | 'bags'
+type Step = 'intro' | 'place' | 'items' | 'bags' | 'summary'
 
 function App() {
   const [currentStep, setCurrentStep] = useState<Step>('intro')
@@ -362,6 +362,128 @@ function App() {
 
             <div className="step-actions">
               <button className="ghost-button" type="button" onClick={() => setCurrentStep('items')}>
+                이전으로
+              </button>
+              <button
+                className="cta"
+                type="button"
+                onClick={() => setCurrentStep('summary')}
+                disabled={!selectedBag}
+              >
+                다음으로
+              </button>
+            </div>
+          </section>
+        )}
+
+        {currentStep === 'summary' && (
+          <section className="place-section" aria-labelledby="summary-heading">
+            <div className="step-header">
+              <div className="section-copy">
+                <p className="section-eyebrow">Step 04</p>
+                <h2 id="summary-heading">오늘의 가방을 확인해보세요</h2>
+                <p className="section-body">
+                  지금까지 고른 장소, 소지품, 가방 정보를 한 번에 확인할 수 있어요.
+                </p>
+              </div>
+            </div>
+
+            <div className="summary-grid">
+              <div className="summary-column">
+                <div className="selected-place" aria-live="polite">
+                  <p className="selected-label">선택한 장소</p>
+                  {selectedPlace ? (
+                    <div className="selected-place-card">
+                      <span className="selected-icon" aria-hidden="true">
+                        {selectedPlace.icon}
+                      </span>
+                      <div>
+                        <strong>{selectedPlace.name}</strong>
+                        <p>{selectedPlace.hint}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="selected-empty">선택한 장소가 없습니다.</p>
+                  )}
+                </div>
+
+                <div className="selected-place" aria-live="polite">
+                  <p className="selected-label">선택한 가방</p>
+                  {selectedBag ? (
+                    <div className="selected-place-card">
+                      <span className="selected-icon" aria-hidden="true">
+                        {selectedBag.icon}
+                      </span>
+                      <div>
+                        <strong>{selectedBag.name}</strong>
+                        <p>{selectedBag.hint}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="selected-empty">선택한 가방이 없습니다.</p>
+                  )}
+                </div>
+
+                <div className="selected-place summary-stat-card" aria-live="polite">
+                  <p className="selected-label">소지품 개수</p>
+                  <div className="summary-stat-content">
+                    <strong>{selectedItems.length}개</strong>
+                    <p>오늘 챙긴 물건이 가방 안에 태그 형태로 정리되어 보여요.</p>
+                  </div>
+                </div>
+
+                <div className="selected-items" aria-live="polite">
+                  <p className="selected-label">체크리스트</p>
+                  {selectedItems.length > 0 ? (
+                    <div className="selected-items-list">
+                      {selectedItems.map((item) => (
+                        <span className="selected-item-pill" key={item}>
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="selected-empty">선택한 소지품이 없습니다.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="bag-preview-panel" aria-live="polite">
+                <p className="selected-label">오늘의 가방 구성</p>
+                <div className="bag-preview">
+                  <div className="bag-preview-frame">
+                    <div className="bag-preview-header">
+                      <div className="bag-preview-emoji" aria-hidden="true">
+                        {selectedBag?.icon ?? '🎒'}
+                      </div>
+                      <div className="bag-preview-copy">
+                        <p className="bag-preview-name">{selectedBag?.name ?? '가방을 선택해주세요'}</p>
+                        <p className="bag-preview-hint">
+                          {selectedBag?.hint ?? '선택한 가방 정보가 여기에 표시됩니다.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bag-pocket">
+                      <div className="bag-pocket-inner">
+                        {selectedItems.length > 0 ? (
+                          selectedItems.map((item) => (
+                            <span className="bag-item-tag" key={item}>
+                              {item}
+                            </span>
+                          ))
+                        ) : (
+                          <p className="selected-empty">가방 안에 표시할 소지품이 없습니다.</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="step-actions">
+              <button className="ghost-button" type="button" onClick={() => setCurrentStep('bags')}>
                 이전으로
               </button>
             </div>
