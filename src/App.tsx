@@ -47,12 +47,20 @@ const bags = [
 ] as const
 
 type Step = 'intro' | 'place' | 'items' | 'bags' | 'summary'
+type SavedCombination = {
+  id: number
+  name: string
+  place: (typeof places)[number]
+  bag: (typeof bags)[number]
+  items: string[]
+}
 
 function App() {
   const [currentStep, setCurrentStep] = useState<Step>('intro')
   const [selectedPlace, setSelectedPlace] = useState<(typeof places)[number] | null>(null)
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [selectedBag, setSelectedBag] = useState<(typeof bags)[number] | null>(null)
+  const [savedCombinations, setSavedCombinations] = useState<SavedCombination[]>([])
   const [checkedItems, setCheckedItems] = useState<string[]>([])
   const [customItems, setCustomItems] = useState<string[]>([])
   const [showCustomItemInput, setShowCustomItemInput] = useState(false)
@@ -94,6 +102,22 @@ function App() {
       currentItems.filter((currentItem) => selectedItems.includes(currentItem)),
     )
   }, [selectedItems])
+
+  const handleSaveCombination = () => {
+    if (!selectedPlace || !selectedBag || selectedItems.length === 0) {
+      return
+    }
+
+    const nextCombination: SavedCombination = {
+      id: Date.now(),
+      name: `${selectedPlace.name}용 ${selectedBag.name} 조합`,
+      place: selectedPlace,
+      bag: selectedBag,
+      items: [...selectedItems],
+    }
+
+    setSavedCombinations((currentCombinations) => [nextCombination, ...currentCombinations])
+  }
 
   return (
     <main className="app">
@@ -513,6 +537,59 @@ function App() {
               <button className="ghost-button" type="button" onClick={() => setCurrentStep('bags')}>
                 이전으로
               </button>
+              <button
+                className="cta"
+                type="button"
+                onClick={handleSaveCombination}
+                disabled={!selectedPlace || !selectedBag || selectedItems.length === 0}
+              >
+                이 조합 저장하기
+              </button>
+            </div>
+
+            <div className="saved-combinations" aria-live="polite">
+              <div className="saved-combinations-header">
+                <p className="selected-label">저장된 가방 조합</p>
+                <p className="saved-combinations-copy">
+                  저장한 조합은 이 화면에서 바로 확인할 수 있어요.
+                </p>
+              </div>
+
+              {savedCombinations.length > 0 ? (
+                <div className="saved-combinations-list">
+                  {savedCombinations.map((combination) => (
+                    <article className="saved-combination-card" key={combination.id}>
+                      <div className="saved-combination-top">
+                        <div>
+                          <h3>{combination.name}</h3>
+                          <p>
+                            {combination.place.icon} {combination.place.name} · {combination.bag.icon}{' '}
+                            {combination.bag.name}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="saved-combination-meta">
+                        <span className="saved-meta-pill">장소: {combination.place.name}</span>
+                        <span className="saved-meta-pill">가방: {combination.bag.name}</span>
+                        <span className="saved-meta-pill">소지품 {combination.items.length}개</span>
+                      </div>
+
+                      <div className="selected-items-list">
+                        {combination.items.map((item) => (
+                          <span className="selected-item-pill" key={`${combination.id}-${item}`}>
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="selected-empty">
+                  아직 저장된 조합이 없어요. 현재 가방 구성을 저장해보세요.
+                </p>
+              )}
             </div>
           </section>
         )}

@@ -662,6 +662,69 @@ h1 {
     0 8px 18px rgba(60, 47, 31, 0.06);
 }
 
+.saved-combinations {
+  margin-top: 28px;
+  padding: 22px;
+  border-radius: 24px;
+  background: rgba(255, 248, 235, 0.8);
+}
+
+.saved-combinations-header {
+  display: grid;
+  gap: 8px;
+}
+
+.saved-combinations-copy {
+  margin: 0;
+  color: #5b6472;
+  line-height: 1.6;
+}
+
+.saved-combinations-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.saved-combination-card {
+  padding: 20px;
+  border-radius: 22px;
+  background: rgba(255, 253, 248, 0.92);
+  box-shadow:
+    inset 0 0 0 1px rgba(148, 163, 184, 0.14),
+    0 16px 32px rgba(60, 47, 31, 0.06);
+}
+
+.saved-combination-top h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #1f2937;
+}
+
+.saved-combination-top p {
+  margin: 8px 0 0;
+  color: #5b6472;
+  line-height: 1.6;
+}
+
+.saved-combination-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.saved-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #fff7ed;
+  color: #9a5b16;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(217, 119, 6, 0.12);
+}
+
 .step-actions {
   display: flex;
   justify-content: space-between;
