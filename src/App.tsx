@@ -38,12 +38,21 @@ const items = [
   '파우치',
 ] as const
 
-type Step = 'intro' | 'place' | 'items'
+const bags = [
+  { name: '백팩', icon: '🎒', hint: '책과 노트북을 넉넉하게 담기 좋아요.' },
+  { name: '토트백', icon: '👜', hint: '가볍게 들고 다니기 좋은 데일리 가방이에요.' },
+  { name: '크로스백', icon: '🛍️', hint: '두 손이 자유로운 편한 외출용 가방이에요.' },
+  { name: '숄더백', icon: '🪶', hint: '필요한 물건을 자연스럽게 챙기기 좋아요.' },
+  { name: '에코백', icon: '〰️', hint: '가볍고 캐주얼한 분위기로 들기 좋아요.' },
+] as const
+
+type Step = 'intro' | 'place' | 'items' | 'bags'
 
 function App() {
   const [currentStep, setCurrentStep] = useState<Step>('intro')
   const [selectedPlace, setSelectedPlace] = useState<(typeof places)[number] | null>(null)
   const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [selectedBag, setSelectedBag] = useState<(typeof bags)[number] | null>(null)
   const [customItems, setCustomItems] = useState<string[]>([])
   const [showCustomItemInput, setShowCustomItemInput] = useState(false)
   const [customItemInput, setCustomItemInput] = useState('')
@@ -270,6 +279,89 @@ function App() {
 
             <div className="step-actions">
               <button className="ghost-button" type="button" onClick={() => setCurrentStep('place')}>
+                이전으로
+              </button>
+              <button
+                className="cta"
+                type="button"
+                onClick={() => setCurrentStep('bags')}
+                disabled={selectedItems.length === 0}
+              >
+                다음으로
+              </button>
+            </div>
+          </section>
+        )}
+
+        {currentStep === 'bags' && (
+          <section className="place-section" aria-labelledby="bags-heading">
+            <div className="step-header">
+              <div className="section-copy">
+                <p className="section-eyebrow">Step 03</p>
+                <h2 id="bags-heading">오늘 사용할 가방을 골라보세요</h2>
+                <p className="section-body">
+                  선택한 소지품을 담을 오늘의 가방을 하나 선택해보세요.
+                </p>
+              </div>
+            </div>
+
+            <div className="selected-place" aria-live="polite">
+              <p className="selected-label">선택한 소지품</p>
+              {selectedItems.length > 0 ? (
+                <div className="selected-items-list">
+                  {selectedItems.map((item) => (
+                    <span className="selected-item-pill" key={item}>
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="selected-empty">아직 고른 소지품이 없습니다.</p>
+              )}
+            </div>
+
+            <div className="bag-grid" role="list" aria-label="가방 선택 목록">
+              {bags.map((bag) => {
+                const isSelected = selectedBag?.name === bag.name
+
+                return (
+                  <button
+                    key={bag.name}
+                    className={`bag-card${isSelected ? ' is-selected' : ''}`}
+                    type="button"
+                    onClick={() => setSelectedBag(bag)}
+                  >
+                    <span className="bag-icon" aria-hidden="true">
+                      {bag.icon}
+                    </span>
+                    <span className="bag-name">{bag.name}</span>
+                    <span className="bag-hint">{bag.hint}</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="selected-place" aria-live="polite">
+              <p className="selected-label">선택한 가방</p>
+              {selectedBag ? (
+                <div className="selected-place-card">
+                  <span className="selected-icon" aria-hidden="true">
+                    {selectedBag.icon}
+                  </span>
+                  <div>
+                    <strong>{selectedBag.name}</strong>
+                    <p>{selectedBag.hint}</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="selected-empty">
+                  아직 가방을 고르지 않았어요. 오늘 사용할 가방 하나를 선택해보세요.
+                </p>
+              )}
+            </div>
+
+            <div className="step-actions">
+              <button className="ghost-button" type="button" onClick={() => setCurrentStep('items')}>
                 이전으로
               </button>
             </div>
