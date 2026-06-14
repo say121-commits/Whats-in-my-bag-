@@ -1,73 +1,87 @@
-# React + TypeScript + Vite
+# 오늘의 가방 (What's in my Bag?)
+장소에 맞는 소지품을 추천받고, 오늘 챙길 가방을 구성할 수 있는 웹 서비스
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+## 프로젝트 소개
+'오늘의 가방'은 사용자가 방문할 장소를 선택하면 해당 장소에 맞는 소지품을 추천하고, 필요한 물건을 직접 추가하여 오늘의 가방을 완성할 수 있는 서비스이다.
+또한 자주 사용하는 가방 구성을 저장하고 다시 불러올 수 있어 반복적인 준비 과정을 줄일 수 있다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## React Compiler
+## 주요 기능:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+-장소 선택: 사용자가 오늘 방문할 장소를 선택한다.
 
-## Expanding the ESLint configuration
+-AI 추천 소지품: AI가 선택한 장소에 맞는 소지품을 추천한다.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+-소지품 직접 추가: 추천 항목 외에도 필요한 물건을 직접 추가할 수 있다.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+-가방 선택: 상황에 맞는 가방을 선택할 수 있다.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+-체크리스트 제공: 최종 선택한 물건을 체크리스트 형태로 확인할 수 있다.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+-가방 조합 저장: 자주 사용하는 가방 구성을 저장할 수 있다.
+
+-저장된 가방 불러오기:저장된 가방 조합을 오늘의 가방으로 다시 선택할 수 있다.
+
+
+## 기술 스택
+
+* React
+* TypeScript
+* Vite
+* CSS
+* LocalStorage
+
+
+## 실행 방법
+
+
+### 1. 저장소 클론
+
+```bash
+git clone [GitHub 저장소 주소]
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. 프로젝트 폴더 이동
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+cd Whats-in-my-bag-
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 3. 패키지 설치
+
+```bash
+npm install
+```
+
+### 4. 개발 서버 실행
+
+```bash
+npm run dev
+```
+
+### 5. 브라우저 접속
+
+```txt
+http://localhost:5173
+```
+
+## 빌드
+
+```bash
+npm run build
+```
+
+## 프로젝트 구조
+
+```txt
+랜딩 페이지
+├ START
+│   └ 장소 선택
+│       └ 추천 소지품 선택
+│           └ 가방 선택
+│               └ 가방 구성 확인
+│                   └ 오늘의 가방
+└ SAVED BAGS
+    └ 저장된 가방 조회
 ```
