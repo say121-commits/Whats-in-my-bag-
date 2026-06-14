@@ -39,7 +39,7 @@
 ### 1. 저장소 클론
 
 ```bash
-git clone [GitHub 저장소 주소]
+git clone [https://github.com/say121-commits/Whats-in-my-bag-/tree/main]
 ```
 
 ### 2. 프로젝트 폴더 이동
